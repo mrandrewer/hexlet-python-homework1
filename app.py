@@ -1,4 +1,5 @@
 import sys
+import numpy
 from functools import partial
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import (
@@ -20,6 +21,7 @@ class MainWindow(QMainWindow):
         self._field_size_spin = None
         self._field_layout = None
         self._field_widget = None
+        self._field_data = None
         self.__init_ui()
 
 
@@ -57,30 +59,29 @@ class MainWindow(QMainWindow):
         return field_container
 
 
-    def __replace_field(self, new_field):
-        self._field_layout.replaceWidget(self._field_widget, new_field)
-        self._field_widget.deleteLater()
-        self._field_widget = new_field
-
-
-    def __draw_field(self, size=3):
-        field = QWidget()
-        layout = QGridLayout(field)
+    def __replace_field(self, size=3):
+        new_field = QWidget()
+        layout = QGridLayout(new_field)
         for x in range(0, size):
             for y in range(0, size):
                 btn = QPushButton(self._field_widget)
                 btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                 btn.clicked.connect(partial(self.__on_field_btn_click, btn, x, y))
                 layout.addWidget(btn, x, y)
-        return field
+        self._field_data = numpy.zeros((size, size), dtype=int)
+        self._field_layout.replaceWidget(self._field_widget, new_field)
+        self._field_widget.deleteLater()
+        self._field_widget = new_field
 
 
     def __on_start_game_btn_click(self):
-        self.__replace_field(self.__draw_field(3))
+        self.__replace_field(3)
 
     
     def __on_field_btn_click(self, btn, x, y):
+        self._field_data[x][y] = 1
         btn.setText(f"{x} {y}")
+        print(self._field_data)
 
 
 
