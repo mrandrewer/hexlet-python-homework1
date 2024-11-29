@@ -81,6 +81,7 @@ class MainWindow(QMainWindow):
     def __on_field_btn_click(self, btn, x, y):
         self._field_data[x][y] = 1
         btn.setText(f"x")
+        btn.setEnabled(False)
         print(self._field_data)
 
 
