@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 pyqt5 = "^5.15.11"
+funtools = "^0.1.0"
 
 
 [build-system]

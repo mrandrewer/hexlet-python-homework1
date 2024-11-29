@@ -1,4 +1,5 @@
 import sys
+from functools import partial
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import (
     QApplication,
@@ -65,17 +66,22 @@ class MainWindow(QMainWindow):
     def __draw_field(self, size=3):
         field = QWidget()
         layout = QGridLayout(field)
-        for i in range(0, size):
-            for j in range(0, size):
+        for x in range(0, size):
+            for y in range(0, size):
                 btn = QPushButton(self._field_widget)
-                btn.setText(f"{i} {j}")
                 btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-                layout.addWidget(btn, i, j)
+                btn.clicked.connect(partial(self.__on_field_btn_click, btn, x, y))
+                layout.addWidget(btn, x, y)
         return field
 
 
     def __on_start_game_btn_click(self):
         self.__replace_field(self.__draw_field(3))
+
+    
+    def __on_field_btn_click(self, btn, x, y):
+        btn.setText(f"{x} {y}")
+
 
 
 if __name__ == '__main__':
