@@ -17,6 +17,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self._field_size_spin = None
+        self._field_layout = None
         self._field_widget = None
         self.__init_ui()
 
@@ -37,33 +38,44 @@ class MainWindow(QMainWindow):
         self._field_size_spin = QSpinBox(self) 
         layout.addWidget(self._field_size_spin)
         start_game_btn = QPushButton("Начать игру")
+        start_game_btn.clicked.connect(self.__on_start_game_btn_click)
         layout.addWidget(start_game_btn)
         return layout
 
 
     def __init_field(self):
-        self._field_widget = QWidget(self)
-        layout = QHBoxLayout(self._field_widget)
-        label = QLabel("Выберите размер поля и начните игру", parent=self._field_widget)
+        field_container = QWidget(self)
+        layout = QHBoxLayout(field_container)
+        label = QLabel("Выберите размер поля и начните игру", parent=field_container)
         label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         label.setAlignment(QtCore.Qt.AlignCenter)
         layout.addWidget(label)
-        self._field_widget.setLayout(layout)
-        return self._field_widget
+        field_container.setLayout(layout)
+        self._field_widget = label
+        self._field_layout = layout
+        return field_container
 
 
-    def __draw_field(self):
-        for child in list(self._field_widget.children()):
-            child.deleteLater()
+    def __replace_field(self, new_field):
+        self._field_layout.replaceWidget(self._field_widget, new_field)
+        self._field_widget.deleteLater()
+        self._field_widget = new_field
 
-        layout = QGridLayout()
-        for i in range(0, 3):
-            for j in range(0, 3):
+
+    def __draw_field(self, size=3):
+        field = QWidget()
+        layout = QGridLayout(field)
+        for i in range(0, size):
+            for j in range(0, size):
                 btn = QPushButton(self._field_widget)
                 btn.setText(f"{i} {j}")
                 btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                 layout.addWidget(btn, i, j)
-        self._field_widget.setLayout(layout)
+        return field
+
+
+    def __on_start_game_btn_click(self):
+        self.__replace_field(self.__draw_field(3))
 
 
 if __name__ == '__main__':
