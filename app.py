@@ -22,6 +22,8 @@ class MainWindow(QMainWindow):
         self._field_layout = None
         self._field_widget = None
         self._field_data = None
+        self._field_buttons = None
+        self._field_size = 3
         self.__init_ui()
 
 
@@ -59,30 +61,52 @@ class MainWindow(QMainWindow):
         return field_container
 
 
-    def __replace_field(self, size=3):
+    def __replace_field(self):
+        self._field_data = numpy.zeros((self._field_size, self._field_size), dtype=int)
+        self._field_buttons = numpy.empty((self._field_size, self._field_size), dtype=QPushButton)
+
         new_field = QWidget()
         layout = QGridLayout(new_field)
-        for x in range(0, size):
-            for y in range(0, size):
+        for x in range(0, self._field_size):
+            for y in range(0, self._field_size):
                 btn = QPushButton(self._field_widget)
                 btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-                btn.clicked.connect(partial(self.__on_field_btn_click, btn, x, y))
+                btn.clicked.connect(partial(self.__on_field_btn_click, x, y))
                 layout.addWidget(btn, x, y)
-        self._field_data = numpy.zeros((size, size), dtype=int)
+                self._field_buttons[x][y] = btn
+
         self._field_layout.replaceWidget(self._field_widget, new_field)
         self._field_widget.deleteLater()
         self._field_widget = new_field
 
 
+    def _make_turn(self, x, y, player=True):
+        self._field_data[x][y] = 1 if player else -1
+        self._field_buttons[x][y].setText(f"x" if player else "o")
+        self._field_buttons[x][y].setEnabled(False)
+        print(self._field_data)
+
+
+    def _make_ai_turn(self):
+        (x, y) = self._select_ai_position()
+        self._make_turn(x, y, player=False)
+
+    def _select_ai_position(self):
+        for x in range(0, self._field_size):
+            for y in range(0, self._field_size):
+                if self._field_data[x][y] == 0:
+                    return (x, y)
+        return None
+
     def __on_start_game_btn_click(self):
-        self.__replace_field(3)
+        self.__replace_field()
 
     
-    def __on_field_btn_click(self, btn, x, y):
-        self._field_data[x][y] = 1
-        btn.setText(f"x")
-        btn.setEnabled(False)
-        print(self._field_data)
+    def __on_field_btn_click(self, x, y):
+       self._make_turn(x, y)
+       self._make_ai_turn()
+
+    
 
 
 
