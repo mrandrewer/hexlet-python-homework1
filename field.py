@@ -102,5 +102,9 @@ class Field:
         return PlayerType(self.field_data[x][y])
 
 
+    def get_winner(self):
+        return self._get_winner(self.field_data)
+
+
     def __str__(self):
         return str(self.field_data)

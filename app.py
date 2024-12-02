@@ -9,10 +9,9 @@ from PyQt5.QtWidgets import (
     QGridLayout,
     QHBoxLayout,
     QVBoxLayout,
-    QLabel,
     QPushButton,
-    QSpinBox,
-    QSizePolicy
+    QSizePolicy,
+    QMessageBox
 )
 
 from field import Field, PlayerType
@@ -82,14 +81,39 @@ class MainWindow(QMainWindow):
                 self._update_field_btn(btn, cell_value)
 
 
-    def __on_start_game_btn_click(self):
+    def start_game(self):
         self.__create_field()
         self._update_field()
+
+    def finish_game(self, winner):
+        self._update_field()
+        msg = QMessageBox() 
+        msg.setIcon(QMessageBox.Information)
+        msg.setText(f"Игра закончена! Победил {'игрок' if winner == PlayerType.PLAYER else 'компьютер'}") 
+        msg.setWindowTitle("Игра закончена")  
+        msg.setStandardButtons(QMessageBox.Ok) 
+        msg.exec_()
+        self.start_game()
+
+    
+    def check_winner(self):
+        winner = self._field.get_winner()
+        if winner != PlayerType(0):
+            self.finish_game(winner)
+            return True
+        return False
+
+    def __on_start_game_btn_click(self):
+       self.start_game()
 
     
     def __on_field_btn_click(self, x, y):
         self._field.make_turn(x, y)
+        if self.check_winner():
+            return
         self._field.make_ai_turn()
+        if self.check_winner():
+            return
         self._update_field()
         print(self._field)
 
