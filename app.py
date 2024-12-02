@@ -90,7 +90,10 @@ class MainWindow(QMainWindow):
         self._update_field()
         msg = QMessageBox() 
         msg.setIcon(QMessageBox.Information)
-        msg.setText(f"Игра закончена! Победил {'игрок' if winner == PlayerType.PLAYER else 'компьютер'}") 
+        if winner:
+            msg.setText(f"Игра закончена! Победил {'игрок' if winner == PlayerType.PLAYER else 'компьютер'}") 
+        else:
+            msg.setText(f"Игра закончена! Ничья") 
         msg.setWindowTitle("Игра закончена")  
         msg.setStandardButtons(QMessageBox.Ok) 
         msg.exec_()
@@ -101,6 +104,9 @@ class MainWindow(QMainWindow):
         winner = self._field.get_winner()
         if winner != PlayerType(0):
             self.finish_game(winner)
+            return True
+        if self._field.get_game_over():
+            self.finish_game(None)
             return True
         return False
 
@@ -117,7 +123,7 @@ class MainWindow(QMainWindow):
         if self.check_winner():
             return
         self._update_field()
-        
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -28,7 +28,7 @@ class Field:
 
 
     def _game_over(self, field_data):
-        if self.has_winner(field_data):
+        if self._get_winner(field_data):
             return True
         for x in range(0, self.field_size):
             for y in range(0, self.field_size):
@@ -103,6 +103,10 @@ class Field:
 
     def get_winner(self):
         return self._get_winner(self.field_data)
+        
+
+    def get_game_over(self):
+        return self._game_over(self.field_data)
 
 
     def __str__(self):
