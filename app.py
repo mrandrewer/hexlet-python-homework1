@@ -117,8 +117,7 @@ class MainWindow(QMainWindow):
         if self.check_winner():
             return
         self._update_field()
-        print(self._field)
-
+        
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

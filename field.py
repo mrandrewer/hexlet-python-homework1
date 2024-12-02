@@ -56,13 +56,13 @@ class Field:
         rate = float('-inf')
         winner = self._get_winner(field_data)
         if winner != PlayerType.NOBODY:
-            return winner
+            return float(winner)
         for action in self._get_allowed_moves(field_data):
             (x, y) = action
             rate = max(
                 rate,
                 self._rate_field_min(
-                    self._apply_move(field_data, x, y, PlayerType.PLAYER)))
+                    self._apply_move(field_data, x, y, PlayerType.AI)))
         return rate
 
     
@@ -70,26 +70,25 @@ class Field:
         rate = float('inf')
         winner = self._get_winner(field_data)
         if winner != PlayerType.NOBODY:
-            return winner
+            return float(winner)
         for action in self._get_allowed_moves(field_data):
             (x, y) = action
             rate = min(
                 rate,
                 self._rate_field_max(
-                    self._apply_move(field_data, x, y, PlayerType.AI)))
+                    self._apply_move(field_data, x, y, PlayerType.PLAYER)))
         return rate
     
 
     def make_ai_turn(self):
         allowed_actions = self._get_allowed_moves(self.field_data)
-        print(allowed_actions)
         move_results = []
         for action in allowed_actions:
             (x, y) = action
             move_results.append([
                 self._rate_field_min(self._apply_move(self.field_data, x, y, PlayerType.AI)),
                 action])
-        ai_action = sorted(move_results, key=lambda r: r[0], reverse=True)[0][1]
+        ai_action = sorted(move_results, key=lambda r: r[0])[0][1]
         (x, y) = ai_action
         self.make_turn(x, y, player=False)
 
