@@ -18,7 +18,6 @@ from PyQt5.QtWidgets import (
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self._field_size_spin = None
         self._field_layout = None
         self._field_widget = None
         self._field_data = None
@@ -38,10 +37,6 @@ class MainWindow(QMainWindow):
 
     def __init_settings(self):
         layout = QHBoxLayout()
-        label = QLabel("Размер поля: ", parent=self)
-        layout.addWidget(label)
-        self._field_size_spin = QSpinBox(self) 
-        layout.addWidget(self._field_size_spin)
         start_game_btn = QPushButton("Начать игру")
         start_game_btn.clicked.connect(self.__on_start_game_btn_click)
         layout.addWidget(start_game_btn)
@@ -64,7 +59,6 @@ class MainWindow(QMainWindow):
     def __replace_field(self):
         self._field_data = numpy.zeros((self._field_size, self._field_size), dtype=int)
         self._field_buttons = numpy.empty((self._field_size, self._field_size), dtype=QPushButton)
-
         new_field = QWidget()
         layout = QGridLayout(new_field)
         for x in range(0, self._field_size):
@@ -74,10 +68,12 @@ class MainWindow(QMainWindow):
                 btn.clicked.connect(partial(self.__on_field_btn_click, x, y))
                 layout.addWidget(btn, x, y)
                 self._field_buttons[x][y] = btn
-
         self._field_layout.replaceWidget(self._field_widget, new_field)
         self._field_widget.deleteLater()
         self._field_widget = new_field
+
+
+    def _ckeck_win_condition(self):
 
 
     def _make_turn(self, x, y, player=True):
@@ -91,12 +87,14 @@ class MainWindow(QMainWindow):
         (x, y) = self._select_ai_position()
         self._make_turn(x, y, player=False)
 
+
     def _select_ai_position(self):
         for x in range(0, self._field_size):
             for y in range(0, self._field_size):
                 if self._field_data[x][y] == 0:
                     return (x, y)
         return None
+
 
     def __on_start_game_btn_click(self):
         self.__replace_field()
