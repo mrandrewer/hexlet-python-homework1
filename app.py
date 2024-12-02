@@ -30,6 +30,7 @@ class MainWindow(QMainWindow):
 
 
     def __init_ui(self):
+        self.setWindowTitle("Крестики нолики")
         layout = QVBoxLayout()
         layout.addLayout(self.__init_settings())
         layout.addWidget(self.__init_field())
@@ -102,6 +103,7 @@ class MainWindow(QMainWindow):
             self.finish_game(winner)
             return True
         return False
+
 
     def __on_start_game_btn_click(self):
        self.start_game()
