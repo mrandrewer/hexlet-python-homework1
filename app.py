@@ -15,14 +15,15 @@ from PyQt5.QtWidgets import (
     QSizePolicy
 )
 
+from field import Field, PlayerType
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self._field_layout = None
         self._field_widget = None
-        self._field_data = None
+        self._field = None
         self._field_buttons = None
-        self._field_size = 3
         self.__init_ui()
 
 
@@ -57,43 +58,40 @@ class MainWindow(QMainWindow):
 
 
     def __replace_field(self):
-        self._field_data = numpy.zeros((self._field_size, self._field_size), dtype=int)
-        self._field_buttons = numpy.empty((self._field_size, self._field_size), dtype=QPushButton)
-        new_field = QWidget()
-        layout = QGridLayout(new_field)
-        for x in range(0, self._field_size):
-            for y in range(0, self._field_size):
+        self._field = Field()
+        self._field_buttons = numpy.empty((self._field.field_size, self._field.field_size), dtype=QPushButton)
+        new_field_widget = QWidget()
+        layout = QGridLayout(new_field_widget)
+        for x in range(0, self._field.field_size):
+            for y in range(0, self._field.field_size):
                 btn = QPushButton(self._field_widget)
                 btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                 btn.clicked.connect(partial(self.__on_field_btn_click, x, y))
                 layout.addWidget(btn, x, y)
                 self._field_buttons[x][y] = btn
-        self._field_layout.replaceWidget(self._field_widget, new_field)
+        self._field_layout.replaceWidget(self._field_widget, new_field_widget)
         self._field_widget.deleteLater()
-        self._field_widget = new_field
+        self._field_widget = new_field_widget
 
 
-    def _ckeck_win_condition(self):
+    def _update_field_btn(self, btn, cell_value):
+        if cell_value == PlayerType.PLAYER:
+            btn.setText("X")
+            btn.setEnabled(False)
+        elif cell_value == PlayerType.AI:
+            btn.setText("O")
+            btn.setEnabled(False)
+        else:
+            btn.setText("")
+            btn.setEnabled(True)
 
 
-    def _make_turn(self, x, y, player=True):
-        self._field_data[x][y] = 1 if player else -1
-        self._field_buttons[x][y].setText(f"x" if player else "o")
-        self._field_buttons[x][y].setEnabled(False)
-        print(self._field_data)
-
-
-    def _make_ai_turn(self):
-        (x, y) = self._select_ai_position()
-        self._make_turn(x, y, player=False)
-
-
-    def _select_ai_position(self):
-        for x in range(0, self._field_size):
-            for y in range(0, self._field_size):
-                if self._field_data[x][y] == 0:
-                    return (x, y)
-        return None
+    def _update_field(self):
+        for x in range(0, self._field.field_size):
+            for y in range(0, self._field.field_size):
+                cell_value = self._field.get_cell_value(x, y)
+                btn = self._field_buttons[x][y]
+                self._update_field_btn(btn, cell_value)
 
 
     def __on_start_game_btn_click(self):
@@ -101,11 +99,10 @@ class MainWindow(QMainWindow):
 
     
     def __on_field_btn_click(self, x, y):
-       self._make_turn(x, y)
-       self._make_ai_turn()
-
-    
-
+        self._field.make_turn(x, y)
+        self._field.make_ai_turn()
+        self._update_field()
+        print(self._field)
 
 
 if __name__ == '__main__':
