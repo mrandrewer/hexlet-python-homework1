@@ -37,6 +37,20 @@ class MainWindow(QMainWindow):
         center_widget = QWidget(parent=self)
         center_widget.setLayout(layout)
         self.setCentralWidget(center_widget)
+        self.setStyleSheet("""
+            QPushButton {
+                background-color: white;
+                color: black;
+                border: 2px solid black;
+                padding: 0;
+                font-size: 32px;
+            }
+        """)
+        frameGm = self.frameGeometry()
+        screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
+        centerPoint = QApplication.desktop().screenGeometry(screen).center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
     
 
     def __init_settings(self):
